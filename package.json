@@ -8,8 +8,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vite build && wrangler deploy",
-    "deploy:ambassador": "CLOUDFLARE_ENV=ambassador vite build && wrangler deploy --env ambassador",
+    "deploy": "CLOUDFLARE_ENV=ambassador vite build && wrangler deploy --env ambassador",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
@@ -69,6 +68,7 @@
     "tailwindcss": "3.4.17",
     "typescript": "5.9.3",
     "vite": "^6.0.0",
+    "webmcp-types": "^0.1.9",
     "wrangler": "^4.83.0"
   }
 }

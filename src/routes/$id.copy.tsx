@@ -47,6 +47,7 @@ function CopyPage() {
           try {
             const res = await createConfig({ data: { config: next, password } })
             nav({ to: '/$id', params: { id: res.id } })
+            return { id: res.id }
           } catch (err) {
             toast.error(String((err as Error).message ?? err))
             setBusy(false)

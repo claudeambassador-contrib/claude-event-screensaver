@@ -25,6 +25,7 @@ function NewPage() {
           try {
             const res = await createConfig({ data: { config, password } })
             nav({ to: '/$id', params: { id: res.id } })
+            return { id: res.id }
           } catch (err) {
             toast.error(String((err as Error).message ?? err))
             setBusy(false)

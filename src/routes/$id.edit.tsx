@@ -43,8 +43,10 @@ function EditPage() {
               const res = await verifyConfigPassword({ data: { id, password: pw } })
               if (res.ok) setPassword(pw)
               else setGateError('Invalid password')
+              return { ok: res.ok }
             } catch (err) {
               setGateError(String((err as Error).message ?? err))
+              return { ok: false }
             } finally {
               setGateBusy(false)
             }

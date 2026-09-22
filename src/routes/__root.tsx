@@ -12,7 +12,7 @@ export const Route = createRootRoute({
       {
         name: 'description',
         content:
-          'Claude Code community event screensaver. Agents: see /llms.txt for the REST API to create or update a screensaver config.',
+          'Claude Code community event screensaver. Agents: see /llms.txt for the REST API, or use the WebMCP tools registered on /new and /{id}/edit.',
       },
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
@@ -37,7 +37,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
         <meta
           name="ai-instructions"
-          content="For programmatic access (create / read / update screensaver configs) see /llms.txt"
+          content="For programmatic access (create / read / update screensaver configs) see /llms.txt; browser agents can also use the WebMCP tools registered on /new and /{id}/edit."
         />
       </head>
       <body>

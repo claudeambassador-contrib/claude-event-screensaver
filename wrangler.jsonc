@@ -3,7 +3,7 @@
   "name": "claude-event-screensaver",
   "compatibility_date": "2026-04-16",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
+  "main": "./src/worker-entry.ts",
   "account_id": "b90fc48710b01ed523ae94ca67d6788e",
   "observability": { "enabled": true },
   // Run `wrangler kv namespace create CONFIGS_KV` and paste the returned id below.
@@ -29,7 +29,14 @@
           "binding": "CONFIGS_KV",
           "id": "0f68fc70fe224eb6810d095a9ce49570"
         }
-      ]
+      ],
+      // Chrome WebMCP origin trial token (public — it ships in the Origin-Trial
+      // response header). Bound to the origin registered at
+      // developer.chrome.com/origin-trial; empty string disables the header.
+      // Local dev uses ORIGIN_TRIAL_TOKEN from .env instead.
+      "vars": {
+        "ORIGIN_TRIAL_TOKEN": ""
+      }
     }
   }
 }

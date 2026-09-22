@@ -13,6 +13,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { configInputSchema, VERB_PRESETS, type ConfigInput } from '@/lib/schema'
+import {
+  createScreensaverInputSchema,
+  fillScreensaverFormInputSchema,
+  formatParseIssues,
+  useWebMcpTools,
+} from '@/lib/webmcp'
 import { DatePicker } from './DatePicker'
 import { TimePicker } from './TimePicker'
 
@@ -59,7 +65,9 @@ export function ConfigForm({
 }: {
   defaultValues: ConfigInput
   passwordMode: PasswordFields
-  onSubmit: (values: { config: ConfigInput; password?: string; newPassword?: string }) => void
+  onSubmit: (
+    values: { config: ConfigInput; password?: string; newPassword?: string },
+  ) => Promise<{ id?: string } | void> | void
   submitting?: boolean
   submitLabel: string
 }) {
@@ -99,6 +107,67 @@ export function ConfigForm({
       newPassword: passwordMode.mode === 'edit-optional' ? newPassword : undefined,
     })
   }
+
+  useWebMcpTools([
+    {
+      name: 'fill-screensaver-form',
+      title: 'Fill screensaver form',
+      description:
+        'Fills the screensaver configuration form on this page with the given values so the human can review them. Does not submit.',
+      inputSchema: fillScreensaverFormInputSchema,
+      execute: (input: Record<string, unknown>) => {
+        const { config } = input as { config: unknown }
+        const parsed = configInputSchema.safeParse(config)
+        if (!parsed.success) {
+          return { ok: false, error: 'Invalid config', issues: formatParseIssues(parsed.error) }
+        }
+        form.reset(parsed.data)
+        return { ok: true }
+      },
+    },
+    {
+      name: 'get-screensaver-form-values',
+      title: 'Get screensaver form values',
+      description: 'Returns the current values of the screensaver configuration form on this page.',
+      annotations: { readOnlyHint: true },
+      execute: () => {
+        // Password fields must never be exposed to agents.
+        const { password: _p, confirm: _c, newPassword: _n, ...values } = form.getValues()
+        void _p
+        void _c
+        void _n
+        return values
+      },
+    },
+    ...(passwordMode.mode === 'create'
+      ? [
+          {
+            name: 'create-screensaver',
+            title: 'Create screensaver',
+            description:
+              'Creates a new screensaver with the given configuration and admin password, then navigates to it. Returns the new screensaver id and its public URL.',
+            annotations: { consequentialHint: true },
+            inputSchema: createScreensaverInputSchema,
+            execute: async (input: Record<string, unknown>) => {
+              const { config, password } = input as { config: unknown; password: unknown }
+              if (typeof password !== 'string' || password.length < 4) {
+                return {
+                  ok: false,
+                  error: 'password must be a string of at least 4 characters',
+                }
+              }
+              const parsed = configInputSchema.safeParse(config)
+              if (!parsed.success) {
+                return { ok: false, error: 'Invalid config', issues: formatParseIssues(parsed.error) }
+              }
+              const res = await onSubmit({ config: parsed.data, password })
+              if (!res?.id) return { ok: false, error: 'Creating the screensaver failed' }
+              return { ok: true, id: res.id, url: `${window.location.origin}/${res.id}` }
+            },
+          },
+        ]
+      : []),
+  ])
 
   return (
     <form onSubmit={handleSubmit(submit)} className="space-y-6 max-w-3xl mx-auto p-6 pr-40">

@@ -31,8 +31,19 @@ The dev server runs against a local miniflare KV namespace — no Cloudflare acc
 
 ## Deploy
 
-1. Create a KV namespace and put its ID in `wrangler.jsonc` under `kv_namespaces`.
-2. `bun run deploy` (runs `vite build && wrangler deploy`).
+Deploys go to the **ambassador environment** only — the custom domain
+`screen.claudeambassadortools.com` (own Cloudflare account + KV, see
+`env.ambassador` in `wrangler.jsonc`).
+
+1. Create a KV namespace in that account and put its ID under
+   `env.ambassador.kv_namespaces`.
+2. Set the Chrome WebMCP origin trial token in `env.ambassador.vars.ORIGIN_TRIAL_TOKEN`
+   (public — it ships in the `Origin-Trial` response header). Empty string
+   disables the header.
+3. `bun run deploy` (runs the ambassador build, then `wrangler deploy --env ambassador`).
+
+Local dev (`bun dev`) uses the top-level config + `.env` — no Cloudflare
+account needed; `ORIGIN_TRIAL_TOKEN` in `.env` feeds the header locally.
 
 ## Credits
 

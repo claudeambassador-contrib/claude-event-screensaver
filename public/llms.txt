@@ -7,7 +7,8 @@
 > KV), keyed by a 6-character ID, and protected by a per-config admin
 > password.
 
-**Base URL:** `https://claude-event-screensaver.claudecommunityau.workers.dev`
+**Base URL:** the origin this file is served from — the URL you fetched
+`/llms.txt` from. All paths below are relative to it.
 
 **Source:** `https://github.com/claudecommunity-au/claude-event-screensaver`
 
@@ -31,6 +32,25 @@
 | "look at / inspect config `X`" | `GET /api/configs/X` (password required) |
 | "show me the screensaver for `X`" | hand the human `${BASE}/X` — no API call needed |
 | "clone `X` into a new one" | `GET /api/configs/X`, then `POST /api/configs` with that body + new password |
+
+## WebMCP (browser-native agents)
+
+If you are a browser-integrated agent (e.g. the Chrome built-in agent,
+ChatGPT Desktop, Brave Leo) and the browser supports
+[`document.modelContext`](https://github.com/webmachinelearning/webmcp),
+this site registers tools on its edit pages. Prefer them — they reuse the
+page's own validation and keep the human in the loop:
+
+| page        | tools                                                       |
+| ----------- | ----------------------------------------------------------- |
+| `/new`      | `fill-screensaver-form`, `get-screensaver-form-values`, `create-screensaver` |
+| `/{id}/copy`| same as `/new`                                               |
+| `/{id}/edit`| `unlock-screensaver` (before unlock), then `fill-screensaver-form`, `get-screensaver-form-values` |
+
+The `config` argument of these tools matches the Config JSON shape below
+(schema provided via each tool's `inputSchema`). `create-screensaver` returns
+`{ id, url }` on success. If the browser has no WebMCP support, use the REST
+API below instead.
 
 ## Config JSON shape
 
@@ -85,7 +105,7 @@ password — either one the human provides, or generate a random one and tell
 them what it is.
 
 ```bash
-BASE="https://claude-event-screensaver.claudecommunityau.workers.dev"
+BASE="<the origin you fetched this file from>"
 curl -sS -X POST "$BASE/api/configs" \
   -H "content-type: application/json" \
   -d '{

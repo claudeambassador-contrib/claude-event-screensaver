@@ -4,7 +4,8 @@ A small HTTP API for creating, updating, and retrieving screensaver configs.
 All endpoints return JSON. Content type for request bodies must be
 `application/json`.
 
-**Base URL:** `https://claude-event-screensaver.claudecommunityau.workers.dev`
+**Base URL:** the deployed origin of this app — the URL you open the
+screensaver at. All paths below are relative to it.
 
 ## Authentication
 
@@ -90,7 +91,7 @@ Content-Type: application/json
 ```json
 {
   "id": "A7K3QZ",
-  "url": "https://claude-event-screensaver.claudecommunityau.workers.dev/A7K3QZ"
+  "url": "<base-url>/A7K3QZ"
 }
 ```
 
@@ -157,7 +158,7 @@ X-Config-Password: your-password
 ```json
 {
   "id": "A7K3QZ",
-  "url": "https://claude-event-screensaver.claudecommunityau.workers.dev/A7K3QZ"
+  "url": "<base-url>/A7K3QZ"
 }
 ```
 
@@ -172,7 +173,7 @@ X-Config-Password: your-password
 ```bash
 # 1. Create
 curl -s -X POST \
-  "https://claude-event-screensaver.claudecommunityau.workers.dev/api/configs" \
+  "<base-url>/api/configs" \
   -H "content-type: application/json" \
   -d '{
     "config": {
@@ -204,6 +205,16 @@ curl -s -X PUT "https://.../api/configs/A7K3QZ" \
   -H "X-Config-Password: correcthorse" \
   -d '{ "config": { ...updated ConfigObject... } }'
 ```
+
+## WebMCP (browser-native agents)
+
+In addition to this REST API, the app registers [WebMCP](https://github.com/webmachinelearning/webmcp)
+tools via `document.modelContext` on `/new`, `/{id}/copy`, and `/{id}/edit`
+(`fill-screensaver-form`, `get-screensaver-form-values`, `create-screensaver`,
+and `unlock-screensaver` on the edit password gate). Browser-integrated agents
+that support WebMCP should prefer those tools — they reuse the page's own
+validation and keep the form visible to the human. Their `config` parameter
+matches the Config object above.
 
 ## Viewing the screensaver
 
