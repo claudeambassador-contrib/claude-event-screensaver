@@ -35,7 +35,6 @@
       // developer.chrome.com/origin-trial; empty string disables the header.
       // Local dev uses ORIGIN_TRIAL_TOKEN from .env instead.
       "vars": {
-        "ORIGIN_TRIAL_TOKEN": ""
       }
     }
   }
